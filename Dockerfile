@@ -1,6 +1,21 @@
 ARG BASE_IMAGE=eclipse-temurin:21-jre
 FROM ${BASE_IMAGE}
 
+ADD https://cache-redirector.jetbrains.com/intellij-jbr/jbr_jcef-21.0.7-linux-x64-b1020.35.tar.gz /opt/java/runtime/jbr.tar.gz
+RUN tar -xvzf /opt/java/runtime/jbr.tar.gz -C /opt/java/runtime/
+
+RUN mv /opt/java/runtime/jbr_jcef-21.0.7-linux-x64-b1020.35/* /opt/java/runtime
+
+RUN rm /opt/java/runtime/jbr.tar.gz
+RUN rm -rf /opt/java/runtime/jbr_jcef-21.0.7-linux-x64-b1020.35
+
+RUN file="$(ls -1 /opt/java/runtime/)" && echo $file
+
+ADD https://github.com/HotswapProjects/HotswapAgent/releases/download/RELEASE-2.0.1/hotswap-agent-2.0.1.jar /opt/java/runtime/lib/hotswap
+
+ENV JAVA_HOME=/opt/java/runtime
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
 # hook into docker BuildKit --platform support
 # see https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETOS
